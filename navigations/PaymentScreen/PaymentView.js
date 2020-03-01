@@ -83,6 +83,7 @@ class PaymentView extends Component {
           var newStock = doc.data().stock - container.Quantity;
           doc.ref.set({ stock: newStock }, { merge: true });
           this.addUserContainer(container);
+          this.addTransactionInfo(container);
         });
       });
 
@@ -106,6 +107,25 @@ class PaymentView extends Component {
       });
 
   }
+
+  addTransactionInfo = (container) => {
+    var db = firebase.firestore();
+    db.collection("container-transaction")
+      .doc(firebase.auth().currentUser.uid)
+      .add(
+        {
+          uid: currentUser.id,
+          quantity: container.Quantity,
+          size: container.Size,
+          price: container.price,
+          orderedDate: firebase.firestore.Timestamp.now()
+        }
+      )
+      .then(() => {
+        console.info('>>> transaction added');
+      });
+
+  } 
 
   showValidationErrors = () => {
     this.setState({ validationDialogVisible: true })
